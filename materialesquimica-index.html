@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Materiales</title>
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --card: #ffffff;
+    --border: #e2e0d9;
+    --text: #2c2c2a;
+    --text-secondary: #6b6a63;
+    --accent: #0f6e56;
+    --accent-light: #e1f5ee;
+    --danger: #a32d2d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 28px;
+  }
+  .icon-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: 6px 0 20px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+  }
+  input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+  button {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.92; }
+  button.secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    margin-top: 12px;
+  }
+  .error {
+    display: none;
+    font-size: 13px;
+    color: var(--danger);
+    margin: -2px 0 12px;
+  }
+  .curso-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px;
+  }
+  .link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .link-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    background: var(--bg);
+  }
+  .link-item:hover { border-color: var(--accent); }
+  .link-item .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  #content { display: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div id="gate">
+    <div class="icon-row">
+      <h1>Materiales</h1>
+    </div>
+    <p class="subtitle">Ingresá el código que te compartió tu profesor</p>
+    <input type="text" id="pw" placeholder="Código" autocomplete="off" autocapitalize="off">
+    <div class="error" id="err">Ese código no existe, revisalo con tu profesor</div>
+    <button id="enter">Entrar</button>
+  </div>
+
+  <div id="content">
+    <p class="curso-title" id="curso-title"></p>
+    <div class="link-list" id="links"></div>
+    <button class="secondary" id="volver">Volver</button>
+  </div>
+</div>
+
+<script>
+  // Para agregar o modificar cursos, editá este objeto.
+  // Cada código apunta a un curso con su lista de archivos.
+  var codigos = {
+    "fq2xnico": {
+      curso: "FQA - 2° año 2026",
+      links: [
+        { nombre: "FQA Cuadernillo 2° 2026", url: "https://drive.google.com/file/d/1KA2_JCTA0D-Xu-QDOAl_fSIGhngIhH9i/view?usp=drive_link" }
+      ]
+    },
+    "fq3xnico": {
+      curso: "FQA - 3° año 2026",
+      links: [
+        { nombre: "FQA Cuadernillo 3° 2026", url: "https://drive.google.com/file/d/1TVei7EOpqXw8FTo25XsOOUBQCkuk3S-7/view?usp=drive_link" }
+      ]
+    },
+    "intfisicaxnico": {
+      curso: "IAF - 4° año 2026",
+      links: [
+        { nombre: "IAF Cuadernillo 4° 2026", url: "https://drive.google.com/file/d/1LlaZzjmvw_F6yDzZ03858iiIPSNruXnp/view?usp=drive_link" }
+      ]
+    },
+    "quimicaxnico": {
+      curso: "IAQ - 5° año 2026",
+      links: [
+        { nombre: "IAQ Cuadernillo 5° 2026", url: "https://drive.google.com/file/d/1hbqj_cVoBXILvkOWwUPDYQEzTYKsb3-D/view?usp=drive_link" }
+      ]
+    }
+  };
+
+  var gate = document.getElementById('gate');
+  var content = document.getElementById('content');
+  var pwInput = document.getElementById('pw');
+  var err = document.getElementById('err');
+
+  function tryEnter() {
+    var val = pwInput.value.trim().toLowerCase();
+    var curso = codigos[val];
+    if (curso) {
+      err.style.display = 'none';
+      gate.style.display = 'none';
+      content.style.display = 'block';
+      document.getElementById('curso-title').textContent = curso.curso;
+      var linksDiv = document.getElementById('links');
+      linksDiv.innerHTML = '';
+      curso.links.forEach(function (l) {
+        var a = document.createElement('a');
+        a.className = 'link-item';
+        a.href = l.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.innerHTML = '<span class="dot"></span>' + l.nombre;
+        linksDiv.appendChild(a);
+      });
+    } else {
+      err.style.display = 'block';
+    }
+  }
+
+  document.getElementById('enter').addEventListener('click', tryEnter);
+  pwInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') tryEnter();
+  });
+  document.getElementById('volver').addEventListener('click', function () {
+    gate.style.display = 'block';
+    content.style.display = 'none';
+    pwInput.value = '';
+    err.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>
