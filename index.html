@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto de Introducción a la Química</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s ease;
+    background: #121212;
+  }
+  .card {
+    background: #1E1E1E;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    padding: 36px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
+  h1 {
+    font-size: 20px;
+    margin-bottom: 24px;
+    color: #E879F9;
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #2A2A2A;
+    border: 2px solid #D946EF;
+    border-radius: 8px;
+    font-size: 15px;
+    text-align: center;
+    color: #F1F1F1;
+  }
+  input::placeholder { color: #B0B0B0; }
+  #btnEntrar {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    background: #D946EF;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #btnEntrar:hover { opacity: 0.85; }
+  #error { color: #F87171; font-size: 13px; margin-top: 10px; min-height: 16px; }
+
+  .curso-card {
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    padding: 36px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
+  .curso-titulo { font-size: 20px; font-weight: bold; margin-bottom: 24px; }
+  .btn-drive {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    border: 3px solid;
+    background: #1a1a1a;
+  }
+  .fila-iconos {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 26px;
+  }
+  .btn-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: #1a1a1a;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-icono:hover { opacity: 0.8; }
+  .hidden { display: none; }
+</style>
+</head>
+<body id="body">
+
+  <div class="card" id="pantallaLogin">
+    <h1>Proyecto de Introducción a la Química</h1>
+    <input type="password" id="contrasena" placeholder="🔑 Contraseña" />
+    <button id="btnEntrar" onclick="ingresar()">Ingresar</button>
+    <div id="error"></div>
+  </div>
+
+  <div class="curso-card hidden" id="pantallaCurso">
+    <div class="curso-titulo" id="cursoTitulo"></div>
+    <a class="btn-drive" id="btnDrive" href="#" target="_blank" rel="noopener">Ir a la carpeta de Drive</a>
+    <div class="fila-iconos">
+      <button class="btn-icono" id="btnVolver" onclick="volver()" title="Volver">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
+      <button class="btn-icono" id="btnCompartir" onclick="compartir()" title="Compartir">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg>
+      </button>
+    </div>
+  </div>
+
+<script>
+  const CURSOS = {
+    cr:  {
+      nombre: "5° CR",
+      clave: "quimicaCR",
+      link: "https://drive.google.com/drive/folders/1NmJUEXYqwqXrtVPd8CIfnqe_YvSSe8Mg?usp=drive_link",
+      color: "#38BDF8",       // celeste/azul, acento principal
+      fondoCard: "#0B2A3D",   // dark navy
+    },
+    ajm: {
+      nombre: "5° A JM",
+      clave: "quimicaAJM",
+      link: "https://drive.google.com/drive/folders/1Vj830aGbME-RpJ1DkBYcsp-W3teMgU37?usp=drive_link",
+      color: "#4ADE80",       // verde, acento principal
+      fondoCard: "#1F2A17",   // dark olive
+    },
+    bjm: {
+      nombre: "5° B JM",
+      clave: "quimicaBJM",
+      link: "https://drive.google.com/drive/folders/1IeMxpjdkYbBCj9nkJnxKK67LLWSl7BNy?usp=drive_link",
+      color: "#FACC15",       // amarillo, acento principal
+      fondoCard: "#241F0A",   // dark mostaza
+    },
+  };
+
+  let cursoActual = null;
+
+  function ingresar() {
+    const clave = document.getElementById("contrasena").value;
+    const error = document.getElementById("error");
+    const curso = Object.values(CURSOS).find(c => c.clave === clave);
+
+    if (!curso) {
+      error.textContent = "Contraseña incorrecta.";
+      return;
+    }
+    cursoActual = curso;
+    error.textContent = "";
+
+    document.getElementById("pantallaLogin").classList.add("hidden");
+    const pantallaCurso = document.getElementById("pantallaCurso");
+    pantallaCurso.classList.remove("hidden");
+    pantallaCurso.style.background = curso.fondoCard;
+
+    document.getElementById("cursoTitulo").textContent = curso.nombre;
+    document.getElementById("cursoTitulo").style.color = curso.color;
+
+    const btn = document.getElementById("btnDrive");
+    btn.href = curso.link;
+    btn.style.color = curso.color;
+    btn.style.borderColor = curso.color;
+
+    document.getElementById("btnVolver").style.borderColor = curso.color;
+    document.getElementById("btnVolver").style.color = curso.color;
+    document.getElementById("btnCompartir").style.borderColor = curso.color;
+    document.getElementById("btnCompartir").style.color = curso.color;
+  }
+
+  function volver() {
+    document.getElementById("pantallaCurso").classList.add("hidden");
+    document.getElementById("pantallaLogin").classList.remove("hidden");
+    document.getElementById("contrasena").value = "";
+    document.getElementById("error").textContent = "";
+    cursoActual = null;
+  }
+
+  async function compartir() {
+    if (!cursoActual) return;
+    const btn = document.getElementById("btnCompartir");
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: cursoActual.nombre, url: cursoActual.link });
+      } catch (e) { /* cancelado por el usuario, no hacemos nada */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(cursoActual.link);
+        const original = btn.innerHTML;
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        setTimeout(() => { btn.innerHTML = original; }, 1500);
+      } catch (e) {
+        alert(cursoActual.link);
+      }
+    }
+  }
+
+  document.getElementById("contrasena").addEventListener("keyup", function(e) {
+    if (e.key === "Enter") ingresar();
+  });
+</script>
+</body>
+</html>
